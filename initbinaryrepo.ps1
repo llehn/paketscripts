@@ -27,4 +27,6 @@ Download-File "https://raw.githubusercontent.com/llehn/paketscripts/master/paket
 
 Download-File "https://raw.githubusercontent.com/llehn/paketscripts/master/readme.md" "readme.md"
 
-Write-Output "Done, open paket.template and readme.md and replace CAPITAL TEXT with real content"
+Write-Output "Open paket.template and readme.md and replace CAPITAL TEXT with real content."
+Write-Output "Then commit and push the repo."
+Write-Output "Done."
