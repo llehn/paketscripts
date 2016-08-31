@@ -10,6 +10,53 @@ echo "1.0" > "version"
 
 New-Item -ItemType directory -Path ".paket"
 
+function Get-Downloader {
+param (
+  [string]$url
+ )
+
+  $downloader = new-object System.Net.WebClient
+
+  $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials
+  if ($defaultCreds -ne $null) {
+    $downloader.Credentials = $defaultCreds
+  }
+
+  # check if a proxy is required
+  $explicitProxy = $env:chocolateyProxyLocation
+  $explicitProxyUser = $env:chocolateyProxyUser
+  $explicitProxyPassword = $env:chocolateyProxyPassword
+  if ($explicitProxy -ne $null) {
+    # explicit proxy
+    $proxy = New-Object System.Net.WebProxy($explicitProxy, $true)
+    if ($explicitProxyPassword -ne $null) {
+      $passwd = ConvertTo-SecureString $explicitProxyPassword -AsPlainText -Force
+      $proxy.Credentials = New-Object System.Management.Automation.PSCredential ($explicitProxyUser, $passwd)
+    }
+
+    Write-Debug "Using explicit proxy server '$explicitProxy'."
+    $downloader.Proxy = $proxy
+
+  } elseif (!$downloader.Proxy.IsBypassed($url))
+  {
+    # system proxy (pass through)
+    $creds = $defaultCreds
+    if ($creds -eq $null) {
+      Write-Debug "Default credentials were null. Attempting backup method"
+      $cred = get-credential
+      $creds = $cred.GetNetworkCredential();
+    }
+    
+    $proxyaddress = $downloader.Proxy.GetProxy($url).Authority
+    Write-Debug "Using system proxy server '$proxyaddress'."
+    $proxy = New-Object System.Net.WebProxy($proxyaddress)
+    $proxy.Credentials = $creds
+    $downloader.Proxy = $proxy
+  }  
+  
+  return $downloader
+}
+
 function Download-File {
 param (
   [string]$url,
