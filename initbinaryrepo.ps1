@@ -4,6 +4,12 @@ if (-not (Test-Path ".git")) {
 
 Write-Output "Initializing repository for binary files"
 
+$null > "paket.dependencies"
+$null > "paket.lock"
+echo "1.0" > "version"
+
+New-Item -ItemType directory -Path ".paket"
+
 function Download-File {
 param (
   [string]$url,
@@ -15,4 +21,10 @@ param (
   $downloader.DownloadFile($url, $file)
 }
 
-Download-File 
+Download-File "https://github.com/fsprojects/Paket/releases/download/3.17.2/paket.bootstrapper.exe" ".paket\paket.bootstrapper.exe"
+
+Download-File "https://raw.githubusercontent.com/llehn/paketscripts/master/paket.template" "paket.template"
+
+Download-File "https://raw.githubusercontent.com/llehn/paketscripts/master/readme.md" "readme.md"
+
+Write-Output "Done, open paket.template and readme.md and replace CAPITAL TEXT with real content"
