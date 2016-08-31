@@ -1,0 +1,8 @@
+type file
+id ENTER.NAME.OF.YOUR.PACKAGE
+version 1.0
+authors Kardex Internal
+description
+    ENTER DESCRIPTION HERE
+files
+    *.dll ==> lib
