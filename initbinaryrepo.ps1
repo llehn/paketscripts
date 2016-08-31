@@ -6,7 +6,7 @@ Write-Output "Initializing repository for binary files"
 
 $null > "paket.dependencies"
 $null > "paket.lock"
-echo "1.0" > "version"
+"1.0" | Out-File "version" -encoding ASCII
 
 New-Item -ItemType directory -Path ".paket"
 
