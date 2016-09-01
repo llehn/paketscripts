@@ -1,5 +1,7 @@
+$ErrorActionPreference = "Stop"
+
 if (-not (Test-Path ".git")) { 
-    throw "Not a git repository, .git folder not found"
+  throw "Not a git repository, .git folder not found"
 }
 
 Write-Output "Initializing repository for binary files"
@@ -8,7 +10,9 @@ $null > "paket.dependencies"
 $null > "paket.lock"
 "1.0" | Out-File "version" -encoding ASCII
 
-New-Item -ItemType directory -Path ".paket"
+if (-not (Test-Path ".paket")) { 
+  New-Item -ItemType directory -Path ".paket" *>$null
+}
 
 function Get-Downloader {
 param (
@@ -68,12 +72,28 @@ param (
   $downloader.DownloadFile($url, $file)
 }
 
-Download-File "https://github.com/fsprojects/Paket/releases/download/3.17.2/paket.bootstrapper.exe" ".paket\paket.bootstrapper.exe"
+function Replace-In-File {
+param (
+  [string]$path,
+  [string]$searchString,
+  [string]$replaceString
+)
+  $content = [System.IO.File]::ReadAllText($path).Replace($searchString, $replaceString)
+  [System.IO.File]::WriteAllText($path, $content)
+}
 
-Download-File "https://raw.githubusercontent.com/llehn/paketscripts/master/paket.template" "paket.template"
+$PackageName = Read-Host -Prompt 'Enter name of the package, something like Kardex.ProjectName.BinariesName'
+$PackageDescription = Read-Host -Prompt 'Enter description the package'
+$Maintainer = Read-Host -Prompt 'Enter maintainer(s)'
 
-Download-File "https://raw.githubusercontent.com/llehn/paketscripts/master/readme.md" "readme.md"
+Download-File "https://github.com/fsprojects/Paket/releases/download/3.17.2/paket.bootstrapper.exe" ".paket\paket.bootstrapper.exe" *>$null
+Download-File "https://raw.githubusercontent.com/llehn/paketscripts/master/paket.template" "paket.template" *>$null
+Download-File "https://raw.githubusercontent.com/llehn/paketscripts/master/readme.md" "readme.md" *>$null
 
-Write-Output "Open paket.template and readme.md and replace CAPITAL TEXT with real content."
-Write-Output "Then commit and push the repo."
-Write-Output "Done."
+Replace-In-File "paket.template" "ENTER.NAME.OF.YOUR.PACKAGE" $PackageName 
+Replace-In-File "paket.template" "ENTER DESCRIPTION HERE" $PackageDescription
+Replace-In-File "readme.md" "ENTER DESCRIPTION OF REPO" $PackageDescription
+Replace-In-File "readme.md" "ENTER MAINTAINERS" $Maintainer
+
+Write-Output "Done! You can commit and push the repository"
+
