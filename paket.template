@@ -1,8 +1,9 @@
 type file
 id ENTER.NAME.OF.YOUR.PACKAGE
+// version is ignored
 version 1.0
 authors Kardex Internal
 description
     ENTER DESCRIPTION HERE
 files
-    *.dll ==> lib
+    lib/*.* ==> lib
