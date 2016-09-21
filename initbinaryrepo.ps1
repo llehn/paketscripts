@@ -1,9 +1,5 @@
 $ErrorActionPreference = "Stop"
 
-if (-not (Test-Path ".git")) { 
-  throw "Not a git repository, .git folder not found"
-}
-
 Write-Output "Initializing repository for binary files"
 
 $null > "paket.dependencies"
